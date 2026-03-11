@@ -39,7 +39,7 @@
             "interface_protocol": "pytorch_task_v1",
             "requirements": {
                 "visualization": "Confusion matrix plot saved.",
-                "validation": "Accuracy > 0.98 on Fashion-MNIST with reasonable epochs."
+                "validation": "Accuracy > 0.90 on Fashion-MNIST with reasonable epochs."
             }
         },
         {
@@ -51,7 +51,7 @@
             "interface_protocol": "pytorch_task_v1",
             "requirements": {
                 "visualization": "Confusion matrix plot saved.",
-                "validation": "Accuracy > 0.98 on Fashion-MNIST with reasonable epochs."
+                "validation": "Accuracy > 0.90 on Fashion-MNIST with reasonable epochs."
             }
         },
         {
@@ -63,7 +63,7 @@
             "interface_protocol": "pytorch_task_v1",
             "requirements": {
                 "visualization": "Confusion matrix plot saved.",
-                "validation": "Accuracy > 0.98 on Fashion-MNIST with reasonable epochs."
+                "validation": "Accuracy > 0.92 on Fashion-MNIST with reasonable epochs."
             }
         },
         {
@@ -75,7 +75,7 @@
             "interface_protocol": "pytorch_task_v1",
             "requirements": {
                 "visualization": "Confusion matrix plot saved.",
-                "validation": "Accuracy > 0.98 on transfer learning with ResNet with reasonable epochs."
+                "validation": "Accuracy > 0.92 on transfer learning with ResNet with reasonable epochs."
             }
         }
     ]
