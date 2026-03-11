@@ -11,25 +11,24 @@ This project applies deep learning training and evaluation to four new tasks usi
 
 ## Tasks
 
-### Task 1: [Task Name]
-- **Dataset**: [Dataset description]
-- **Model**: [Model architecture]
-- **Features**: [Key features]
+### Task 1: LeNet on FashionMNIST
+- **Dataset**: Fashion MNIST
+- **Model**: LeNet-style CNN
 
-### Task 2: [Task Name]
-- **Dataset**: [Dataset description]
-- **Model**: [Model architecture]
-- **Features**: [Key features]
+### Task 2: LeNet on FashionMNIST with AdamW optimizer
+- **Dataset**: Fashion MNIST
+- **Model**: LeNet-style CNN
+- **Features**: Uses AdamW as optimizer
 
-### Task 3: [Task Name]
-- **Dataset**: [Dataset description]
-- **Model**: [Model architecture]
-- **Features**: [Key features]
+### Task 3: VGGNet on FashionMNIST
+- **Dataset**: Fashion MNIST
+- **Model**: VGGNet-style architecture
+- **Features**: 
 
-### Task 4: [Task Name]
-- **Dataset**: [Dataset description]
-- **Model**: [Model architecture]
-- **Features**: [Key features]
+### Task 4: ResNet transfer learning
+- **Dataset**: Fashion MNIST
+- **Model**: ResNet18 
+- **Features**: Performed transfer learning
 
 ## Protocol
 All tasks implement the `pytorch_task_v1` protocol with:
