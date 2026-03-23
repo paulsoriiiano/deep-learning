@@ -1,0 +1,74 @@
+Loading python 3.12.12 module ....
+Running on host: condo3.hpc.coe
+Mon Mar 23 14:49:39 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     Off |   00000000:3B:00.0 Off |                  Off |
+|  0%   27C    P8             20W /  300W |       0MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+======================================================================
+CUDA Core vs Tensor Core GEMM Benchmark
+======================================================================
+
+Task : cuda_core_vs_tensor_core_gemm
+Desc : Measure and explain the performance difference between a 'traditional CUDA-core' GEMM path (FP32, TF32 disabled) and a 'modern Tensor Core' GEMM path (FP32 input/output, TF32 compute).
+
+GPU: NVIDIA A40
+  Compute Capability : 8.6
+  Total Memory       : 50.9 GB
+  SM Count           : 84
+  Tensor Cores       : Yes (Volta+)
+
+──────────────────────────────────────────────────────────────────────
+PyTorch Benchmark  (torch.cuda.Event timing, GPU-side)
+Warm-up iterations : 20
+Bench  iterations  : 100
+──────────────────────────────────────────────────────────────────────
+
+Size (B×M×N)              FP32 (ms)    TF32 (ms)    FP32 TFLOPS    TF32 TFLOPS    Speedup
+------------------------------------------------------------------------------------------
+512×512×512                  0.0322       0.0292         8.3400         9.1880       1.10x
+1024×1024×1024               0.1263       0.0459        17.0003        46.8114       2.75x
+2048×2048×2048               0.9376       0.3644        18.3231        47.1458       2.57x
+4096×4096×4096               7.2666       2.4685        18.9139        55.6765       2.94x
+8192×8192×8192              58.7809      18.4281        18.7053        59.6650       3.19x
+
+Generating plots...
+  Saved plot → ./output/benchmark_comparison.png
+
+Saving artefacts...
+  Saved metrics  → ./output/metrics.json
+  Saved cuBLAS C++ benchmark → ./output/cublas_gemm_benchmark.cu
+
+======================================================================
+BENCHMARK SUMMARY
+======================================================================
+  Average TF32 speedup over FP32 baseline : 2.51x
+  Peak CUDA Core throughput (FP32)         : 18.914 TFLOPS
+  Peak Tensor Core throughput (TF32)       : 59.665 TFLOPS
+
+======================================================================
+QUALITY CHECKS
+======================================================================
+✓ All 5 matrix sizes benchmarked
+✓ TF32 throughput >= FP32 throughput (43.697 vs 16.257 TFLOPS)
+✓ TF32 speedup > 1.0x  (2.51x)
+✓ Valid latency values recorded
+
+======================================================================
+PASS: All quality checks passed!
+======================================================================
