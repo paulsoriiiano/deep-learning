@@ -31,51 +31,42 @@
     },
     "tasks": [
         {
-            "series": "Convolutional Neural Networks",
+            "series": "GPU Performance Engineering",
             "level": 1,
-            "id": "cnn_lvl1_lenet_fashion_mnist",
-            "algorithm": "LeNet on Fashion-MNIST",
-            "description": "Train LeNet-style CNN with data loaders, augmentation, and evaluation.",
+            "id": "gpu_perf_lvl1_cuda_core_vs_tensor_core_gemm",
+            "algorithm": "CUDA Core vs Tensor Core GEMM Benchmark",
+            "description": "Measure and explain the performance difference between a 'traditional CUDA-core' GEMM path (FP32, TF32 disabled) and a 'modern Tensor Core' GEMM path (FP32 input/output, TF32 compute) using a simple fully-connected layer. Sweep matrix sizes from 512x512 to 8192x8192. Also provide an equivalent CUDA C++ cuBLAS benchmark using cublasSgemm (baseline) and cublasGemmEx / cuBLASLt with TF32 Tensor Ops (Tensor Core path). Use GPU-side timing via CUDA Events with warm-up iterations. Report average latency (ms) and compute throughput (TFLOPS). Save a multi-panel comparison plot.",
             "interface_protocol": "pytorch_task_v1",
             "requirements": {
-                "visualization": "Confusion matrix plot saved.",
-                "validation": "Accuracy > 0.90 on Fashion-MNIST with reasonable epochs."
-            }
-        },
-        {
-            "series": "Convolutional Neural Networks",
-            "level": 2,
-            "id": "cnn_lvl2_lenet_fashion_mnist_adamw",
-            "algorithm": "LeNet on Fashion-MNIST using AdamW optimizer",
-            "description": "Train LeNet-style CNN with data loaders, augmentation, and evaluation. Use AdamW as optimizer.",
-            "interface_protocol": "pytorch_task_v1",
-            "requirements": {
-                "visualization": "Confusion matrix plot saved.",
-                "validation": "Accuracy > 0.90 on Fashion-MNIST with reasonable epochs."
-            }
-        },
-        {
-            "series": "Convolutional Neural Networks",
-            "level": 3,
-            "id": "cnn_lvl3_vggnet_fashion_mnist",
-            "algorithm": "VGGNet on Fashion-MNIST",
-            "description": "Train VGGNet-style CNN with data loaders, augmentation, and evaluation.",
-            "interface_protocol": "pytorch_task_v1",
-            "requirements": {
-                "visualization": "Confusion matrix plot saved.",
-                "validation": "Accuracy > 0.92 on Fashion-MNIST with reasonable epochs."
-            }
-        },
-        {
-            "series": "Convolutional Neural Networks",
-            "level": 4,
-            "id": "cnn_lvl4_resnet_transfer_fashion_mnist",
-            "algorithm": "Transfer Learning (ResNet)",
-            "description": "Fine-tune pretrained ResNet on Fashion-MNIST; freeze/unfreeze stages.",
-            "interface_protocol": "pytorch_task_v1",
-            "requirements": {
-                "visualization": "Confusion matrix plot saved.",
-                "validation": "Accuracy > 0.92 on transfer learning with ResNet with reasonable epochs."
+                "benchmark_modes": [
+                    "Mode 1 — FP32 CUDA Core baseline: torch.backends.cuda.matmul.allow_tf32 = False",
+                    "Mode 2 — TF32 Tensor Core path: torch.backends.cuda.matmul.allow_tf32 = True"
+                ],
+                "cublas_equivalent": [
+                    "Baseline: cublasSgemm with CUBLAS_DEFAULT_MATH",
+                    "Tensor Core: cublasGemmEx with CUBLAS_COMPUTE_32F_FAST_TF32 and CUBLAS_GEMM_DEFAULT_TENSOR_OP"
+                ],
+                "matrix_sizes": [
+                    "512x512x512",
+                    "1024x1024x1024",
+                    "2048x2048x2048",
+                    "4096x4096x4096",
+                    "8192x8192x8192"
+                ],
+                "timing": "GPU-side CUDA Events (torch.cuda.Event); warm-up=20, bench=100 iterations; torch.cuda.synchronize() before timing starts.",
+                "metrics": [
+                    "Average latency per forward pass (ms)",
+                    "Compute throughput (TFLOPS) = 2*M*K*N / (latency_s * 1e12)",
+                    "Speedup ratio TF32 / FP32"
+                ],
+                "visualization": "4-panel PNG: (1) latency bar chart (log scale), (2) throughput bar chart, (3) speedup line chart with annotations, (4) latency scaling line chart.",
+                "validation": [
+                    "All 5 matrix sizes benchmarked successfully.",
+                    "TF32 average throughput >= FP32 average throughput on Tensor Core-capable GPUs (Volta, sm_70+).",
+                    "Average TF32 speedup > 1.0x on Tensor Core-capable GPUs.",
+                    "All recorded latency values > 0 ms."
+                ],
+                "additional_deliverable": "cublas_gemm_benchmark.cu — a self-contained CUDA C++ file compilable with: nvcc -O3 -arch=sm_80 cublas_gemm_benchmark.cu -lcublas -o cublas_gemm_bench"
             }
         }
     ]
