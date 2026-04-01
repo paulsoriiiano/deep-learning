@@ -1,0 +1,18 @@
+[project]
+name = "homework2"
+version = "0.1.0"
+description = "Object Detection HW: Update training strategies"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ultralytics>=8.2",
+    "torch>=2.2",
+    "torchvision>=0.17",
+    "pycocotools>=2.0",
+    "matplotlib>=3.8",
+    "pandas>=2.0",
+    "pillow>=10.0",
+    "numpy>=1.26",
+    "jupyter>=1.0",
+    "ipykernel>=6.0",
+]
