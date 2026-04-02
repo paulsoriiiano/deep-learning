@@ -1,0 +1,42 @@
+# configs/baseline.yaml
+# YOLOv8n baseline — no architectural or strategy modifications
+
+model: yolov8n.pt          # pretrained nano checkpoint (transfer learning from COCO)
+data: data/coco.yaml
+
+epochs: 50
+imgsz: 640
+batch: 16
+workers: 8
+device: 0                  # GPU index; use 'cpu' if no GPU
+
+# Optimizer — YOLOv8 default
+optimizer: SGD
+lr0: 0.01
+lrf: 0.01                  # final lr = lr0 * lrf
+momentum: 0.937
+weight_decay: 0.0005
+warmup_epochs: 3
+warmup_momentum: 0.8
+warmup_bias_lr: 0.1
+
+# Augmentation — YOLOv8 defaults (mosaic is on by default)
+hsv_h: 0.015
+hsv_s: 0.7
+hsv_v: 0.4
+degrees: 0.0
+translate: 0.1
+scale: 0.5
+shear: 0.0
+flipud: 0.0
+fliplr: 0.5
+mosaic: 1.0
+mixup: 0.0
+copy_paste: 0.0
+
+# Logging
+project: runs
+name: baseline
+save: true
+plots: true
+val: true
