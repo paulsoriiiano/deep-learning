@@ -10,6 +10,7 @@ uv.lock         # optionally commit this for reproducibility — remove this lin
 data/images/
 data/annotations/
 data/labels/
+data/coco_subset
 *.zip
 
 # Model weights
