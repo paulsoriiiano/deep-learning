@@ -1,0 +1,36 @@
+# .gitignore  (root only — delete data/.gitignore)
+
+# Virtual environment
+.venv/
+
+# uv
+uv.lock         # optionally commit this for reproducibility — remove this line if so
+
+# Dataset — pointers (yaml) are committed, raw files are not
+data/images/
+data/annotations/
+data/labels/
+data/coco_subset
+*.zip
+
+# Model weights
+*.pt
+*.pth
+*.onnx
+
+# Ultralytics training output
+runs/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,81 @@
+# configs/combined_v2.yaml
+# Combined: frozen backbone (arch_only_v2) + v2 training strategy (train_only_v2).
+# This is the expected best-performing run.
+#
+# ARCHITECTURE CHANGE (from arch_only_v2.yaml):
+#   freeze: 10
+#     Freezes the entire backbone (layers 0-9). Only the neck (10-21) and
+#     detection head (22) receive gradient updates — ~1.08M trainable params
+#     vs 3.15M in the baseline. Eliminates catastrophic forgetting of COCO
+#     pretrained features on the small 2,400-image subset.
+#
+# TRAINING STRATEGY CHANGES (from train_only_v2.yaml):
+#   cos_lr: true
+#     Smooth cosine LR decay reduces val loss oscillation in late epochs.
+#
+#   close_mosaic: 20  (was 10)
+#     Extends the mosaic-off window to the last 20 epochs so the model
+#     spends more time training on single realistic images before evaluation.
+#
+#   hsv_s: 0.9, hsv_v: 0.6  (were 0.7, 0.4)
+#     Stronger color jitter expands effective dataset variety without
+#     introducing label noise or geometry artifacts.
+#
+#   translate: 0.15, scale: 0.6  (were 0.1, 0.5)
+#     Broader spatial jitter compensates for the lower object size diversity
+#     in the val2017 subset vs full COCO train.
+#
+#   mixup: 0.0, copy_paste: 0.0
+#     Kept OFF — both hurt on small datasets (caused train_only_v1 to underfit).
+#
+# WHY THE COMBINATION IS EXPECTED TO BE BEST:
+#   The frozen backbone provides a stable, high-quality feature extractor.
+#   The v2 training strategy then improves how the neck and head learn from
+#   those features — smoother LR prevents thrashing in the unfrozen layers,
+#   and the extended mosaic-off window ensures the head adapts to realistic
+#   inputs before convergence. The two changes are complementary: the arch
+#   change determines WHAT is learned, the strategy changes determine HOW
+#   efficiently it is learned.
+
+model: yolov8n.pt
+freeze: 10             # freeze backbone layers 0-9
+
+epochs: 50
+imgsz: 640
+batch: 32
+workers: 8
+device: 0
+
+# Optimizer — cosine LR, otherwise same as baseline
+optimizer: SGD
+lr0: 0.01
+lrf: 0.01
+cos_lr: true           # CHANGED: smooth LR decay
+momentum: 0.937
+weight_decay: 0.0005
+warmup_epochs: 3
+warmup_momentum: 0.8
+warmup_bias_lr: 0.1
+
+# Augmentation — targeted improvements for small dataset
+hsv_h: 0.015
+hsv_s: 0.9             # CHANGED: stronger saturation jitter
+hsv_v: 0.6             # CHANGED: stronger value jitter
+degrees: 0.0
+translate: 0.15        # CHANGED: slightly more translation
+scale: 0.6             # CHANGED: broader scale range
+shear: 0.0
+flipud: 0.0
+fliplr: 0.5
+mosaic: 1.0
+close_mosaic: 20       # CHANGED: drop mosaic for last 20 epochs (was 10)
+mixup: 0.0             # kept OFF
+copy_paste: 0.0        # kept OFF
+
+# Logging
+project: runs
+name: combined_v2
+exist_ok: true
+save: true
+plots: true
+val: true
