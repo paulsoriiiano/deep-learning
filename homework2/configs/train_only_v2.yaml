@@ -1,0 +1,82 @@
+# configs/train_only_v2.yaml
+# Training strategy changes only — architecture identical to baseline (yolov8n.pt).
+#
+# WHAT CHANGED vs baseline and why each change is expected to help:
+#
+#   cos_lr: true
+#     Cosine annealing decays the LR smoothly from epoch 1 rather than
+#     holding it flat then stepping. On a small dataset this prevents the
+#     LR from being too aggressive in later epochs when the model is close
+#     to convergence, reducing the val loss oscillation seen in the baseline.
+#
+#   close_mosaic: 20  (was 10)
+#     Mosaic augmentation stitches 4 images together, which is useful early
+#     in training for scale variety but hurts in late epochs because the
+#     composite images don't resemble real inference inputs. Extending the
+#     mosaic-off window from the last 10 to the last 20 epochs lets the model
+#     spend 40% of training adapting to realistic single-image inputs,
+#     which directly improves val mAP since val images are never mosaicked.
+#
+#   hsv_s: 0.9  (was 0.7), hsv_v: 0.6  (was 0.4)
+#     Stronger HSV color jitter increases the effective variety of the
+#     2,400-image training set without adding any synthetic compositing
+#     artifacts. Color jitter is one of the safest augmentations for small
+#     datasets because it doesn't change object geometry or introduce
+#     label noise, unlike MixUp or copy-paste.
+#
+#   translate: 0.15  (was 0.1), scale: 0.6  (was 0.5)
+#     Slightly more aggressive spatial jitter improves robustness to object
+#     position and size variation. On a 2,400-image subset sampled from
+#     val2017, the diversity of object sizes is lower than full COCO, so
+#     a broader scale range compensates.
+#
+#   mixup: 0.0, copy_paste: 0.0
+#     Both are intentionally kept OFF. These were the main culprits in
+#     train_only_v1's underperformance — they require large datasets to
+#     be beneficial. On 2,400 images they produce training inputs that
+#     the model can't learn from efficiently, causing underfitting.
+#
+# WHAT IS NOT CHANGED:
+#   optimizer, lr0, imgsz, batch — all identical to baseline.
+#   This keeps the comparison clean: only augmentation schedule changes.
+
+model: yolov8n.pt
+
+epochs: 50
+imgsz: 640             # same as baseline — no resolution change
+batch: 32
+workers: 8
+device: 0
+
+# Optimizer — identical to baseline
+optimizer: SGD
+lr0: 0.01
+lrf: 0.01
+cos_lr: true           # CHANGED: smooth LR decay (was false)
+momentum: 0.937
+weight_decay: 0.0005
+warmup_epochs: 3
+warmup_momentum: 0.8
+warmup_bias_lr: 0.1
+
+# Augmentation — targeted improvements for small dataset
+hsv_h: 0.015
+hsv_s: 0.9             # CHANGED: stronger saturation jitter (was 0.7)
+hsv_v: 0.6             # CHANGED: stronger value jitter (was 0.4)
+degrees: 0.0
+translate: 0.15        # CHANGED: slightly more translation (was 0.1)
+scale: 0.6             # CHANGED: broader scale range (was 0.5)
+shear: 0.0
+flipud: 0.0
+fliplr: 0.5
+mosaic: 1.0
+close_mosaic: 20       # CHANGED: drop mosaic earlier (was 10)
+mixup: 0.0             # kept OFF — hurts on small datasets
+copy_paste: 0.0        # kept OFF — hurts on small datasets
+
+# Logging
+project: runs
+name: train_only_v2
+save: true
+plots: true
+val: true
