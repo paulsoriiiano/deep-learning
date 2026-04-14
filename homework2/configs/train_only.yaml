@@ -1,0 +1,64 @@
+# configs/train_only.yaml
+# Training strategy changes only — architecture kept identical to baseline (yolov8n.pt).
+#
+# Changes vs baseline:
+#   optimizer:    SGD      → AdamW
+#   lr0:          0.01     → 0.001    (AdamW converges better at lower LR)
+#   cos_lr:       false    → true     (smooth cosine annealing instead of flat LR)
+#   imgsz:        640      → 768      (larger input = better small object recall)
+#   batch:        32       → 24       (reduced to fit larger imgsz in 8GB VRAM)
+#   mixup:        0.0      → 0.15     (blend pairs of images, improves generalization)
+#   copy_paste:   0.0      → 0.3      (paste objects onto random backgrounds)
+#
+# Why each change works:
+#   AdamW:       decouples weight decay from gradient update, smoother convergence
+#                and better generalization than SGD on small datasets
+#   cos_lr:      avoids sharp LR drops, reduces val loss oscillation (the noisy
+#                curves seen in the baseline are partly a flat-LR artifact)
+#   imgsz 768:   larger receptive field per image — directly improves mAP on
+#                small objects which dominate COCO's hard cases
+#   MixUp:       forces the model to produce soft, interpolated predictions,
+#                acting as a strong regularizer against overfitting on 2400 images
+#   copy_paste:  increases effective object density per image, helps rare classes
+#
+# Model is unchanged so any mAP delta vs baseline is attributable to training alone.
+
+model: yolov8n.pt          # same architecture as baseline
+
+epochs: 50
+imgsz: 768                 # was 640
+batch: 24                  # reduced from 32 to fit imgsz=768 in VRAM
+workers: 8
+device: 0
+
+# Optimizer — switched to AdamW with cosine LR
+optimizer: AdamW
+lr0: 0.001                 # was 0.01 — AdamW needs lower initial LR
+lrf: 0.01
+cos_lr: true               # was false
+momentum: 0.937
+weight_decay: 0.0005
+warmup_epochs: 3
+warmup_momentum: 0.8
+warmup_bias_lr: 0.1
+
+# Augmentation — stronger than baseline
+hsv_h: 0.015
+hsv_s: 0.7
+hsv_v: 0.4
+degrees: 0.0
+translate: 0.1
+scale: 0.5
+shear: 0.0
+flipud: 0.0
+fliplr: 0.5
+mosaic: 1.0
+mixup: 0.15                # was 0.0
+copy_paste: 0.3            # was 0.0
+
+# Logging
+project: runs
+name: train_only
+save: true
+plots: true
+val: true
